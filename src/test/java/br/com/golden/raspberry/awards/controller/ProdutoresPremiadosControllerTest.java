@@ -65,17 +65,17 @@ class ProdutoresPremiadosControllerTest {
 	}
 
 	@Test
-	void testErroCampoFaltando() {
-		var output = controller.uploadFile(getFile("testErroCampoFaltando.csv"));
+	void testErroColunaFaltando() {
+		var output = controller.uploadFile(getFile("testErroColunaFaltando.csv"));
 		assertEquals(BAD_REQUEST, output.getStatusCode());
-		assertTrue(output.getBody().equals("Existem campos não informados no arquivo: producers, winner"));
+		assertTrue(output.getBody().equals("Existem colunas não informadas no arquivo: producers, winner"));
 	}
 
 	@Test
 	void testErroArquivoVazio() {
 		var output = controller.uploadFile(getFile("testErroArquivoVazio.csv"));
 		assertEquals(BAD_REQUEST, output.getStatusCode());
-		assertTrue(output.getBody().contains("Existem campos não informados no arquivo"));
+		assertTrue(output.getBody().contains("Existem colunas não informadas no arquivo"));
 	}
 
 	@Test
@@ -88,6 +88,7 @@ class ProdutoresPremiadosControllerTest {
 		assertTrue(output.getBody().contains("Erro na linha 5: Produtor Allan Carr já cadastrado para o filme Can't Stop the Music"));
 		assertTrue(output.getBody().contains("Erro na linha 6: Campo title não foi informado"));
 		assertTrue(output.getBody().contains("Erro na linha 7: Campo studios não foi informado"));
+		assertTrue(output.getBody().contains("Erro na linha 8: Campo producers não foi informado ou está inválido"));
 		assertTrue(output.getBody().contains("Erro na linha 9: Campo winner não foi informado"));
 	}
 

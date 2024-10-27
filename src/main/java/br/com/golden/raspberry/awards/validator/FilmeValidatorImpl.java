@@ -52,7 +52,7 @@ public class FilmeValidatorImpl implements FilmeValidator {
 				.collect(toList());
 		if (!isEmpty(camposFaltantes)) {
 			throw new ValidationException(
-					"Existem campos não informados no arquivo: " + String.join(", ", camposFaltantes));
+					"Existem colunas não informadas no arquivo: " + String.join(", ", camposFaltantes));
 		}
 	}
 
