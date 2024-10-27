@@ -13,11 +13,10 @@ import jakarta.persistence.Tuple;
 
 @Service
 public class GetProdutoresPremiadosServiceImpl implements GetProdutoresPremiadosService {
-	
+
 	@PersistenceContext
 	private EntityManager em;
-	
-	
+
 	@Override
 	public ProdutoresPremiadosDTO getProdutoresPremiados() {
 		return ProdutoresPremiadosDTO.builder() //

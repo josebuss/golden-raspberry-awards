@@ -2,6 +2,7 @@ package br.com.golden.raspberry.awards.converter;
 
 import static br.com.golden.raspberry.awards.util.CsvUtility.convertToBoolean;
 import static br.com.golden.raspberry.awards.util.CsvUtility.convertToInteger;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import java.io.BufferedReader;
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +24,7 @@ import lombok.Getter;
 
 public class FilmeCsvConverter implements Closeable {
 
+	private static final List<String> DEFAULT_PRODUCERS = List.of("");
 	private InputStream input;
 	private BufferedReader reader;
 	private CSVParser csvParser;
@@ -49,16 +50,17 @@ public class FilmeCsvConverter implements Closeable {
 			return csvParser.getRecords().stream() //
 					.flatMap(rec -> {
 						var produtores = getProdutores(rec.get("producers"));
-						return produtores.stream().map(produtor -> {
-							var entity = new FilmeEntity();
-							entity.setAno(convertToInteger(rec.get("year")));
-							entity.setTitulo(rec.get("title"));
-							entity.setStudios(rec.get("studios"));
-							entity.setVencedor(convertToBoolean(rec.get("winner")));
-							entity.setProdutor(produtor);
-							entity.setLinha(rec.getRecordNumber());
-							return entity;
-						});
+						return produtores.stream() //
+								.map(produtor -> {
+									var entity = new FilmeEntity();
+									entity.setAno(convertToInteger(rec.get("year")));
+									entity.setTitulo(rec.get("title"));
+									entity.setStudios(rec.get("studios"));
+									entity.setVencedor(convertToBoolean(rec.get("winner")));
+									entity.setProdutor(produtor);
+									entity.setLinha(rec.getRecordNumber());
+									return entity;
+								});
 					}).collect(toList());
 		} catch (Exception e) {
 			throw new ValidationException("CSV data is failed to parse: " + e.getMessage());
@@ -66,15 +68,11 @@ public class FilmeCsvConverter implements Closeable {
 	}
 
 	private static List<String> getProdutores(String value) {
-		try {
-			return Arrays.asList(value.split(",|\\s+and\\s+")) //
-					.stream() //
-					.map(String::trim) //
-					.filter(StringUtils::isNotBlank)//
-					.collect(toList());
-		} catch (Exception e) {
-			return List.of(null);
-		}
+		return Arrays.asList(value.split(",|\\s+and\\s+")) //
+				.stream() //
+				.map(String::trim) //
+				.filter(StringUtils::isNotBlank)//
+				.collect(collectingAndThen(toList(), list -> list.isEmpty() ? DEFAULT_PRODUCERS : list));
 	}
 
 }

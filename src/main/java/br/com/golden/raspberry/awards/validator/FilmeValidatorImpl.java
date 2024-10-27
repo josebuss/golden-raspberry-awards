@@ -58,14 +58,14 @@ public class FilmeValidatorImpl implements FilmeValidator {
 
 	private void validarAno(Integer ano) {
 		if (ano.toString().length() != 4) {
-			throw new ValidationException("O ano deve conter 4 caracteres");
+			throw new ValidationException("O ano deve conter 4 caracteres (yyyy)");
 
 		}
 	}
 
 	private void checkIsNull(Object value, String msg) {
-		if ((value instanceof String && isBlank((String)value)) || isNull(value)) {
-			throw new ValidationException(format("Campo {0} não foi informado", msg));
+		if ((value instanceof String && isBlank((String) value)) || isNull(value)) {
+			throw new ValidationException(format("Campo {0} não foi informado ou está inválido", msg));
 		}
 	}
 
