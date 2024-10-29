@@ -1,7 +1,5 @@
 package br.com.golden.raspberry.awards;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -20,7 +18,7 @@ public class StartupApplicationListener {
 	private UploadProdutoresPremiadosService service;
 
 	@EventListener
-	public void onApplicationEvent(ContextRefreshedEvent event) throws IOException {
+	public void onApplicationEvent(ContextRefreshedEvent event) {
 		service.initialLoad();
 	}
 }

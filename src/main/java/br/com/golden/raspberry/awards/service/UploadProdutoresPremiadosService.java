@@ -9,6 +9,6 @@ public interface UploadProdutoresPremiadosService {
 
 	void uploadFile(MultipartFile file) throws IOException;
 	
-	void initialLoad() throws IOException;
+	void initialLoad();
 	
 }
