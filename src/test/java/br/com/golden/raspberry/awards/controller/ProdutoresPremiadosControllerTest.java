@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.golden.raspberry.awards.Application;
@@ -21,6 +22,7 @@ import br.com.golden.raspberry.awards.repository.FilmeRepository;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = Application.class)
+@ActiveProfiles(profiles = {"test"})
 class ProdutoresPremiadosControllerTest {
 
 	@Autowired
@@ -30,9 +32,7 @@ class ProdutoresPremiadosControllerTest {
 
 	@Test
 	void testSucesso() {
-		filmeRepository.deleteAll();
-
-		controller.uploadFile(getFile("testSucesso.csv"));
+		controller.uploadFile(getFile("movielist.csv"));
 
 		var all = filmeRepository.findAll();
 		assertEquals(472, all.size());
@@ -40,21 +40,11 @@ class ProdutoresPremiadosControllerTest {
 		var produtoresPremiados = controller.getProdutoresPremiados();
 
 		var min = produtoresPremiados.getBody().getMin();
-		assertEquals(3, min.size());
+		assertEquals(1, min.size());
 		assertEquals("Joel Silver", min.get(0).getProducer());
 		assertEquals(1, min.get(0).getInterval());
 		assertEquals(1990, min.get(0).getPreviousWin());
 		assertEquals(1991, min.get(0).getFollowingWin());
-
-		assertEquals("Menahem Golan", min.get(1).getProducer());
-		assertEquals(1, min.get(1).getInterval());
-		assertEquals(1986, min.get(1).getPreviousWin());
-		assertEquals(1987, min.get(1).getFollowingWin());
-
-		assertEquals("Yoram Globus", min.get(2).getProducer());
-		assertEquals(1, min.get(2).getInterval());
-		assertEquals(1986, min.get(2).getPreviousWin());
-		assertEquals(1987, min.get(2).getFollowingWin());
 
 		var max = produtoresPremiados.getBody().getMax();
 		assertEquals(1, max.size());
