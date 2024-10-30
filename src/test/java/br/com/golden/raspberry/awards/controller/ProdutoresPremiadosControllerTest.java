@@ -7,7 +7,10 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import br.com.golden.raspberry.awards.Application;
 import br.com.golden.raspberry.awards.repository.FilmeRepository;
 
 @ExtendWith(MockitoExtension.class)
+@TestMethodOrder(OrderAnnotation.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles(profiles = {"test"})
 class ProdutoresPremiadosControllerTest {
@@ -30,10 +34,9 @@ class ProdutoresPremiadosControllerTest {
 	@Autowired
 	private FilmeRepository filmeRepository;
 
+	@Order(1)
 	@Test
-	void testSucesso() {
-		controller.uploadFile(getFile("movielist.csv"));
-
+	void testGetProdutoresPremiadosSucesso() {
 		var all = filmeRepository.findAll();
 		assertEquals(472, all.size());
 
@@ -55,22 +58,51 @@ class ProdutoresPremiadosControllerTest {
 	}
 
 	@Test
-	void testErroColunaFaltando() {
-		var output = controller.uploadFile(getFile("testErroColunaFaltando.csv"));
+	void testUploadFileSucesso() {
+		controller.uploadFile(getFile("testUploadFileSucesso.csv"));
+		
+		var all = filmeRepository.findAll();
+		assertEquals(473, all.size());
+		
+		var produtoresPremiados = controller.getProdutoresPremiados();
+		
+		var min = produtoresPremiados.getBody().getMin();
+		assertEquals(2, min.size());
+		assertEquals("Allan Carr", min.get(0).getProducer());
+		assertEquals(1, min.get(0).getInterval());
+		assertEquals(1980, min.get(0).getPreviousWin());
+		assertEquals(1981, min.get(0).getFollowingWin());
+		
+		assertEquals("Joel Silver", min.get(1).getProducer());
+		assertEquals(1, min.get(1).getInterval());
+		assertEquals(1990, min.get(1).getPreviousWin());
+		assertEquals(1991, min.get(1).getFollowingWin());
+		
+		var max = produtoresPremiados.getBody().getMax();
+		assertEquals(1, max.size());
+		assertEquals("Matthew Vaughn", max.get(0).getProducer());
+		assertEquals(13, max.get(0).getInterval());
+		assertEquals(2002, max.get(0).getPreviousWin());
+		assertEquals(2015, max.get(0).getFollowingWin());
+	}
+
+	@Test
+	void testUploadFileErroColunaFaltando() {
+		var output = controller.uploadFile(getFile("testUploadFileErroColunaFaltando.csv"));
 		assertEquals(BAD_REQUEST, output.getStatusCode());
 		assertTrue(output.getBody().equals("Existem colunas não informadas no arquivo: producers, winner"));
 	}
 
 	@Test
-	void testErroArquivoVazio() {
-		var output = controller.uploadFile(getFile("testErroArquivoVazio.csv"));
+	void testUploadFileErroArquivoVazio() {
+		var output = controller.uploadFile(getFile("testUploadFileErroArquivoVazio.csv"));
 		assertEquals(BAD_REQUEST, output.getStatusCode());
 		assertTrue(output.getBody().contains("Existem colunas não informadas no arquivo"));
 	}
 
 	@Test
-	void testErroValidacaoEntity() {
-		var output = controller.uploadFile(getFile("testErroValidacaoEntity.csv"));
+	void testUploadFileErroValidacaoEntity() {
+		var output = controller.uploadFile(getFile("testUploadFileErroValidacaoEntity.csv"));
 		assertEquals(BAD_REQUEST, output.getStatusCode());
 		assertTrue(output.getBody().contains("Erro na linha 2: O ano deve conter 4 caracteres"));
 		assertTrue(output.getBody().contains("Erro na linha 3: Campo year não foi informado"));
